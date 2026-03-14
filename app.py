@@ -1,109 +1,97 @@
 import streamlit as st
 import cv2
 import numpy as np
-import streamlit.components.v1 as components
 
-# ------------------- КОНФИГУРАЦИЯ СТРАНИЦЫ -------------------
+# ------------------- КОНФИГУРАЦИЯ -------------------
 st.set_page_config(
-    page_title="Abbas | Developer Portfolio",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    page_title="Abbas Portfolio",
+    layout="wide"
 )
 
-# ------------------- ПЕРСОНАЛЬНЫЙ ДИЗАЙН (CSS) -------------------
+# ------------------- ДИЗАЙН (ЗЕЛЕНЫЙ ТЕРМИНАЛ) -------------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+[data-testid="stAppViewContainer"] { background-color: #000000 !important; }
+* { color: #00ff00 !important; font-family: 'Share Tech Mono', monospace !important; }
 
-/* Черный фон и зеленый текст */
-[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {
-    background-color: #000000 !important;
+.abbas-card { 
+    border: 2px solid #00ff00; 
+    padding: 20px; 
+    text-align: center; 
+    margin-bottom: 20px; 
+    box-shadow: 0 0 15px #00ff00; 
 }
 
-* {
-    color: #00ff00 !important;
-    font-family: 'Share Tech Mono', monospace !important;
+.skill-tag {
+    display: inline-block;
+    border: 1px solid #00ff00;
+    padding: 5px 15px;
+    margin: 5px;
+    background: rgba(0, 255, 0, 0.1);
+    border-radius: 5px;
 }
 
-/* Заголовок с неоновым свечением */
-h1 {
-    text-align: center;
-    text-shadow: 0 0 15px #00ff00;
-    border-bottom: 2px solid #00ff00;
-    padding-bottom: 10px;
-}
-
-/* Карточка Аббаса */
-.abbas-card {
-    border: 2px double #00ff00;
-    padding: 25px;
-    margin-bottom: 30px;
-    text-align: center;
-    background: rgba(0, 255, 0, 0.05);
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-}
-
-/* Рамки для медиа-элементов */
-.stImage, iframe, .stCameraInput {
-    border: 1px solid #00ff00 !important;
-}
-
-/* Кнопки */
-button {
+/* Кнопка связи */
+.stButton>button {
+    width: 100%;
     border: 1px solid #00ff00 !important;
     background-color: #051a05 !important;
+    color: #00ff00 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------- ШАПКА И КОНТАКТЫ -------------------
-st.markdown("<h1>SYSTEM ACCESS: AUTHORIZED</h1>", unsafe_allow_html=True)
-
+# ------------------- ПЕРСОНАЛЬНЫЙ БЛОК АББАСА -------------------
 st.markdown(f"""
-<div class="abbas-card">
-    <h2 style="margin:0; letter-spacing: 5px;">РАЗРАБОТЧИК: АББАС</h2>
-    <p style="font-size: 24px; margin:15px 0; font-weight: bold;">+996 559 021 309</p>
-    <p style="font-size: 12px; opacity: 0.6;">PROJECT: SECURE PORTFOLIO | LOCATION: BISHKEK</p>
+<div class='abbas-card'>
+    <h1>DEVELOPER: ABBAS</h1>
+    <h3 style="letter-spacing: 2px;">+996 559 021 309</h3>
 </div>
 """, unsafe_allow_html=True)
 
-# ------------------- ОСНОВНОЙ ИНТЕРФЕЙС -------------------
-col1, col2 = st.columns([1, 1], gap="large")
+# ------------------- ОСНОВНОЙ КОНТЕНТ -------------------
+col1, col2 = st.columns(2, gap="large")
 
 with col1:
-    st.subheader("📷 Обработка Изображений")
-    uploaded = st.file_uploader("Загрузить файл в систему", type=["jpg", "png", "jpeg"])
+    st.subheader("📷 ОБРАБОТКА ДАННЫХ")
+    uploaded = st.file_uploader("Загрузить фото для анализа", type=["jpg", "jpeg", "png"])
     
     if uploaded:
-        # Чтение изображения
         file_bytes = np.asarray(bytearray(uploaded.read()), dtype=np.uint8)
         img = cv2.imdecode(file_bytes, 1)
-        
-        # Конвертация для отображения
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        st.image(img_rgb, caption="Файл успешно загружен в базу данных", use_container_width=True)
-        st.success("Аббас, изображение считано успешно.")
+        st.image(img_rgb, caption="Объект загружен", use_container_width=True)
+        st.success("Аббас, файл успешно считан.")
 
 with col2:
-    st.subheader("🌐 Внешний Модуль")
-    # Здесь можно поставить любую ссылку, например на твой GitHub
-    st.info("Отображение внешнего ресурса под управлением пользователя")
-    components.iframe("https://www.wikipedia.org", height=500, scrolling=True)
+    st.subheader("🛠 ТЕХНОЛОГИЧЕСКИЙ СТЕК")
+    st.markdown("""
+    <div style="margin-top:20px;">
+        <div class="skill-tag">PYTHON 3.11</div>
+        <div class="skill-tag">STREAMLIT</div>
+        <div class="skill-tag">OPENCV</div>
+        <div class="skill-tag">NUMPY</div>
+        <div class="skill-tag">GITHUB</div>
+        <div class="skill-tag">LINUX DEPLOY</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.subheader("💬 СВЯЗАТЬСЯ СО МНОЙ")
+    # Кнопка для быстрого перехода в WhatsApp
+    wa_link = "https://wa.me/996559021309"
+    st.markdown(f'<a href="{wa_link}" target="_blank"><button style="width:100%; cursor:pointer; padding:10px; border:1px solid #00ff00; background:#051a05; color:#00ff00;">НАПИСАТЬ В WHATSAPP</button></a>', unsafe_allow_html=True)
 
 st.markdown("---")
 
 # ------------------- КАМЕРА -------------------
-st.subheader("📹 Видео-захват")
-cam_data = st.camera_input("Активировать камеру для снимка")
+st.subheader("📹 ТЕСТ СИСТЕМЫ ЗАХВАТА")
+cam = st.camera_input("ПРОВЕРКА ВЕБ-КАМЕРЫ")
 
-if cam_data:
-    # Обработка снимка
-    bytes_data = cam_data.getvalue()
-    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    
-    # Показываем результат (можно добавить OpenCV фильтры)
-    st.image(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB), caption="Снимок захвачен")
-    st.info("Система подтверждает: Камера работает стабильно.")
+if cam:
+    img_cam = cv2.imdecode(np.frombuffer(cam.getvalue(), np.uint8), cv2.IMREAD_COLOR)
+    st.image(cv2.cvtColor(img_cam, cv2.COLOR_BGR2RGB), caption="Снимок захвачен")
+    st.info("Аббас, оборудование работает в штатном режиме.")
 
-st.markdown("<p style='text-align:center; opacity:0.5; margin-top:50px;'>Terminal v2.6.0 | Created by Abbas</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; opacity:0.3; margin-top:50px;'>PORTFOLIO SYSTEM v3.0 | 2026</p>", unsafe_allow_html=True)
