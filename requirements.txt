@@ -1,5 +1,3 @@
-setuptools
 streamlit
-ultralytics
-opencv-python-headless
-numpy==1.26.4
+pandas
+requests
