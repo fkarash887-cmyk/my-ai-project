@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Портфолио Аббас</title>
+
+<style>
+body{
+    background:black;
+    color:#00ff00;
+    font-family:monospace;
+    text-align:center;
+}
+
+h1{
+    text-shadow:0 0 10px #00ff00;
+}
+
+.project{
+    border:1px solid #00ff00;
+    padding:20px;
+    width:320px;
+    margin:auto;
+    margin-top:40px;
+}
+
+button{
+    background:black;
+    color:#00ff00;
+    border:1px solid #00ff00;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#00ff00;
+    color:black;
+}
+
+.contact{
+    margin-top:40px;
+    border-top:1px solid #00ff00;
+    padding-top:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Портфолио Аббас</h1>
+
+<p>Разработчик AI проектов</p>
+
+<div class="project">
+<h2>People Counting System</h2>
+
+<p>
+AI система подсчета людей с использованием YOLO.
+</p>
+
+<button onclick="openProject()">
+Открыть проект
+</button>
+</div>
+
+<div class="contact">
+<p>Свяжитесь с нами: +996 559 021 309</p>
+</div>
+
+<script>
+function openProject(){
+    window.open("http://localhost:8501");
+}
+</script>
+
+</body>
+</html>
