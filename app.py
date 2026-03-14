@@ -2,104 +2,130 @@ import streamlit as st
 import cv2
 import numpy as np
 from ultralytics import YOLO
+import streamlit.components.v1 as components
 
-# ------------------- PAGE -------------------
+# ------------------- КОНФИГУРАЦИЯ СТРАНИЦЫ -------------------
 st.set_page_config(
-    page_title="People Counting System",
-    layout="wide"
+    page_title="AI Academy | People Counter",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# ------------------- STYLE -------------------
+# ------------------- ХАКЕРСКИЙ ДИЗАЙН (CSS) -------------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: black !important;
+/* Основной фон и текст */
+[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {
+    background-color: #000000 !important;
+}
+
+* {
     color: #00ff00 !important;
     font-family: 'Share Tech Mono', monospace !important;
 }
 
-/* Фикс для текста и заголовков */
-h1, h2, h3, p, span, label {
-    color: #00ff00 !important;
-}
-
+/* Заголовки */
 h1 {
     text-align: center;
-    text-shadow: 0 0 10px #00ff00;
+    text-shadow: 0 0 15px #00ff00;
+    border-bottom: 2px solid #00ff00;
+    padding-bottom: 10px;
 }
 
-.stButton>button {
-    background-color: black !important;
-    color: #00ff00 !important;
+/* Карточки и рамки */
+.stImage, iframe, [data-testid="stMetricValue"] {
+    border: 2px solid #00ff00 !important;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+/* Кнопки и инпуты */
+button, .stFileUploader {
     border: 1px solid #00ff00 !important;
-    width: 100%;
+    background-color: #051a05 !important;
 }
 
-.stImage {
-    border: 2px solid #00ff00;
-}
-
-hr {
-    border: 1px solid #00ff00;
+/* Стиль для метрик */
+[data-testid="stMetricValue"] {
+    background-color: #051a05;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------- TITLE -------------------
-st.markdown("<h1>PEOPLE COUNTING SYSTEM</h1>", unsafe_allow_html=True)
-st.markdown("---")
-
-# ------------------- MODEL -------------------
-# Кэшируем модель, чтобы она не загружалась при каждом обновлении страницы
+# ------------------- ЗАГРУЗКА МОДЕЛИ -------------------
 @st.cache_resource
-def load_model():
+def load_yolo():
+    # Загружаем легкую модель YOLOv8
     return YOLO("yolov8n.pt")
 
-model = load_model()
+model = load_yolo()
 
-# ------------------- MAIN INTERFACE -------------------
-col1, col2 = st.columns([1, 1])
+# ------------------- ЗАГОЛОВОК -------------------
+st.markdown("<h1>SYSTEM: PEOPLE COUNTING PORTFOLIO</h1>", unsafe_allow_html=True)
+
+# ------------------- ОСНОВНОЙ ИНТЕРФЕЙС -------------------
+col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
-    st.subheader("📷 Загрузка изображения")
-    uploaded = st.file_uploader("Выберите фото...", type=["jpg", "png", "jpeg"])
+    st.subheader("📡 AI SCANNER (Изображение)")
+    uploaded = st.file_uploader("Загрузить объект для анализа", type=["jpg", "png", "jpeg"])
     
     if uploaded:
-        # Конвертация файла в формат OpenCV
+        # Чтение файла
         file_bytes = np.asarray(bytearray(uploaded.read()), dtype=np.uint8)
         img = cv2.imdecode(file_bytes, 1)
 
+        # Детекция
         results = model(img)[0]
-        annotated = results.plot()
-        people = sum(1 for b in results.boxes if int(b.cls) == 0)
+        annotated_img = results.plot()
+        
+        # Подсчет людей (ID класса 0 в YOLO - это person)
+        people_count = sum(1 for b in results.boxes if int(b.cls) == 0)
 
-        st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB), caption="Результат детекции")
-        st.success(f"Найдено людей: {people}")
+        # Вывод
+        st.image(cv2.cvtColor(annotated_img, cv2.COLOR_BGR2RGB), use_container_width=True)
+        st.metric("ОБНАРУЖЕНО ОБЪЕКТОВ (HUMAN)", people_count)
 
 with col2:
-    st.subheader("🌐 Внешний проект / Сайт")
-    # Тот самый функционал "подключения другого сайта", о котором вы просили
-    st.info("Здесь можно отобразить ваш другой репозиторий или документацию")
-    st.components.v1.iframe("https://docs.ultralytics.com/", height=500, scrolling=True)
+    st.subheader("🌐 CONNECTED PROJECT (Другой сайт)")
+    
+    # Выбор сайта для отображения
+    site_option = st.selectbox("Выберите проект для просмотра:", 
+                                ["Документация AI", "Мой GitHub", "Другой проект"])
+    
+    if site_option == "Документация AI":
+        url = "https://docs.ultralytics.com/"
+    elif site_option == "Мой GitHub":
+        url = "https://github.com" # Замени на свою ссылку
+    else:
+        url = "https://www.wikipedia.org"
+
+    # Вставка стороннего сайта
+    components.iframe(url, height=550, scrolling=True)
 
 st.markdown("---")
 
-# ------------------- CAMERA NOTE -------------------
-st.subheader("📹 Работа с камерой")
-st.warning("Внимание: cv2.VideoCapture(0) работает только при запуске локально на Windows!")
+# ------------------- КАМЕРА (ДЛЯ ОБЛАКА) -------------------
+st.subheader("📹 LIVE STREAM SCANNER")
+st.info("Используйте этот блок для захвата кадра с вашей камеры в реальном времени.")
 
-# В облаке используем st.camera_input для захвата кадра от пользователя
-img_file_buffer = st.camera_input("Сделать снимок с веб-камеры")
+cam_input = st.camera_input("АКТИВИРОВАТЬ СКАНЕР")
 
-if img_file_buffer is not None:
-    bytes_data = img_file_buffer.getvalue()
+if cam_input:
+    # Обработка снимка с камеры
+    bytes_data = cam_input.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     
-    results = model(cv2_img)[0]
-    annotated = results.plot()
-    people = sum(1 for b in results.boxes if int(b.cls) == 0)
+    # Анализ
+    res = model(cv2_img)[0]
+    final_frame = res.plot()
+    count = sum(1 for b in res.boxes if int(b.cls) == 0)
     
-    st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB))
-    st.metric("Людей в кадре", people)
+    st.image(cv2.cvtColor(final_frame, cv2.COLOR_BGR2RGB))
+    st.success(f"Сканирование завершено. Найдено целей: {count}")
+
+st.markdown("<p style='text-align:center'>Terminal v2.6.0 | AI Academy Projects</p>", unsafe_allow_html=True)
